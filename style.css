@@ -1,0 +1,58 @@
+:root {
+  --hourDiffHeight: 20vh;
+}
+
+* {
+  maring: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+html, body {
+  font-size: 3vh;
+  margin: 0;
+  padding: 0;
+}
+
+#workingHourDiff {
+  width: 100vw;
+  height: var(--hourDiffHeight);
+  border: 3px solid red;
+  font-size: 2rem;
+  line-height: var(--hourDiffHeight);
+}
+
+#addWorkingHours {
+  width: 100vw;
+  height: var(--hourDiffHeight);
+  border: 3px solid blue;
+  font-size: 1.5rem;
+}
+
+#hoursEntry {
+  display: block;
+  transition: height .5s;
+  width: 100wv;
+  height: 0;
+  border: 3px solid green;
+  font-size: 1.5rem;
+  overflow-y: hidden;
+}
+
+#hoursEntry input {
+  display: block;
+  font-size: 1rem;
+  margin: auto;
+  height: var(--hourDiffHeight);
+  border: 2px dashed black;
+  background-color: white;
+}
+
+#hoursEntry input[type='date'] {
+  width: auto;
+}
+
+#hoursEntry input[type='number'] {
+  width: 75%;
+}
