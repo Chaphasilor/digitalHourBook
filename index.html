@@ -14,7 +14,7 @@
   </head>
   <body>
     
-    <div id='workingHourDiff'>
+    <div id='overtime'>
       <span>+5</span>
     </div>
     
@@ -24,7 +24,7 @@
       
       <input type='date' name='date' value="" />
       
-      <input type='number' name='amount' value='4' />
+      <input type='text' name='amount' value='4' />
       
       <input type='submit' value='Submit' />
     
@@ -36,7 +36,20 @@
         
         document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
         
-        initDB();
+        initDB().then(function(response) {
+          
+          console.log(response);
+          
+          calculateOvertime().then(function(overtime) {
+            
+            let overtimeSpan = document.querySelector('#overtime').querySelector('span');
+            overtimeSpan.innerHTML = overtime;
+            
+            overtime<0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
+            
+          });
+          
+        })
         
       }
       

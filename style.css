@@ -15,7 +15,7 @@ html, body {
   padding: 0;
 }
 
-#workingHourDiff {
+#overtime {
   width: 100vw;
   height: var(--hourDiffHeight);
   border: 3px solid red;
