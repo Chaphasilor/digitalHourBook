@@ -38,6 +38,9 @@ function initDB() {
       var db = event.target.result;
       var objStore = db.createObjectStore("days", {keyPath: "date"});
       var attribute = objStore.createIndex("by_hours", "hours", { unique: false });
+      let firstDay = '2018-10-22'; // The first working day ever
+      let firstDayHours = 2 // The amount of hours you've worked on your first day
+      // addRecord(firstDay, firstDayHours);
       
     };
     
