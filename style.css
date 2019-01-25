@@ -23,14 +23,14 @@ html, body {
   line-height: var(--hourDiffHeight);
 }
 
-#addWorkingHours {
+.entryForm {
   width: 100vw;
   height: var(--hourDiffHeight);
   border: 3px solid blue;
   font-size: 1.5rem;
 }
 
-#hoursEntry {
+#hoursEntry, #holidaysEntry {
   display: block;
   transition: height .5s;
   width: 100wv;
@@ -40,7 +40,7 @@ html, body {
   overflow-y: hidden;
 }
 
-#hoursEntry input {
+#hoursEntry input, #holidaysEntry input {
   display: block;
   font-size: 1rem;
   margin: auto;
@@ -49,10 +49,10 @@ html, body {
   background-color: white;
 }
 
-#hoursEntry input[type='date'] {
+#hoursEntry input[type='date'], #holidaysEntry input[type='date'] {
   width: auto;
 }
 
-#hoursEntry input[type='number'] {
+#hoursEntry input[type='text'], #holidaysEntry input[type='text'] {
   width: 75%;
 }

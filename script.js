@@ -4,9 +4,15 @@ Date.prototype.toDateInputValue = (function() {
     return local.toJSON().slice(0,10);
 });
 
-function newEntry() {
+function newHoursEntry() {
   
   document.querySelector('#hoursEntry').style.height = 'calc( 3 * var(--hourDiffHeight)';
+  
+}
+
+function newHolidaysEntry() {
+  
+  document.querySelector('#holidaysEntry').style.height = 'calc( 3 * var(--hourDiffHeight)';
   
 }
 
@@ -15,7 +21,7 @@ var db;
 function initDB() {
   return new Promise(function(resolve, reject) {
     
-    var request = window.indexedDB.open("hourBook", 2);
+    var request = window.indexedDB.open("hourBook", 4);
     
     request.onsuccess = function(event) {
             
@@ -36,11 +42,23 @@ function initDB() {
     request.onupgradeneeded = function (event) {
   
       var db = event.target.result;
-      var objStore = db.createObjectStore("days", {keyPath: "date"});
-      var attribute = objStore.createIndex("by_hours", "hours", { unique: false });
-      let firstDay = '2018-10-22'; // The first working day ever
-      let firstDayHours = 2 // The amount of hours you've worked on your first day
-      // addRecord(firstDay, firstDayHours);
+      
+      try {
+        let days = db.createObjectStore("days", {keyPath: "date"});
+        let hours = days.createIndex("by_hours", "hours", {unique: false});
+        let firstDay = '2018-10-22'; // The first working day ever
+        let firstDayHours = 2 // The amount of hours you've worked on your first day
+        // addRecord(firstDay, firstDayHours);
+      } catch(e) {
+        console.log("Object store already exists");
+      }
+      
+      try {
+        let holidays = db.createObjectStore("daysOff", {keyPath: "startDate"});
+        let timeOff = holidays.createIndex("by_timeOff", "timeOff", {unique: false});
+      } catch(e) {
+        console.log("Object store already exists");
+      }
       
     };
     
@@ -69,7 +87,7 @@ function getDay(date) {
 function addDay(date, hours) {
   
   if (isNaN(hours)) {
-    alert('The amount of hours you put is not a number!');
+    alert("The amount of hours you put is not a number!");
   } else {
 
     let tx = db.transaction(['days'], "readwrite");
@@ -79,11 +97,7 @@ function addDay(date, hours) {
     let request = txObj.put({date: date, hours: Number(hours)});
 
     request.onsuccess = function() {
-
       console.log("Success!");
-
-      // getRecord(store, request.result);
-
     }
     
   }
@@ -101,6 +115,26 @@ function deleteDay(date) {
     console.log("Success!");
   }
 
+}
+
+function addHolidays(date, timeOff) {
+  
+    if (isNaN(timeOff)) {
+      alert("The amount of days off you've put is not a number!");
+    } else {
+  
+      let tx = db.transaction(['daysOff'], "readwrite");
+      let txObj = tx.objectStore('daysOff');
+  
+      console.log(date+", "+timeOff);
+      let request = txObj.put({startDate: date, timeOff: Number(timeOff)});
+  
+      request.onsuccess = function() {
+        console.log("Success!");  
+      }
+      
+    }
+  
 }
 
 function getAllHours() {

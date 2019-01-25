@@ -18,13 +18,25 @@
       <span>not available</span>
     </div>
     
-    <button id='addWorkingHours' type='button' onclick="newEntry();">Add hours</button>
+    <button id='addWorkingHours' class='entryForm' type='button' onclick="newHoursEntry();">Add working hours</button>
       
-    <form id='hoursEntry' action='' onsubmit="event.preventDefault();addDay(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+    <form id='hoursEntry' action='' onsubmit="event.preventDefault();this.style.height='0';addDay(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
       
       <input type='date' name='date' value="" />
       
       <input type='text' name='amount' value='4' />
+      
+      <input type='submit' value='Submit' />
+    
+    </form>
+    
+    <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
+      
+    <form id='holidaysEntry' action='' onsubmit="event.preventDefault();this.style.height='0';addHolidays(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+      
+      <input type='date' name='date' value="" />
+      
+      <input type='text' name='timeOff' value='1' />
       
       <input type='submit' value='Submit' />
     
