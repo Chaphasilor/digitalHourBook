@@ -1,3 +1,5 @@
+var globalAttributes = {};
+
 Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);
     local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
@@ -97,7 +99,10 @@ function addDay(date, hours) {
     let request = txObj.put({date: date, hours: Number(hours)});
 
     request.onsuccess = function() {
-      console.log("Success!");
+      
+      console.log("Success");
+      window.location.reload();
+      
     }
     
   }
@@ -131,6 +136,7 @@ function addHolidays(date, timeOff) {
   
       request.onsuccess = function() {
         console.log("Success!");  
+        window.location.reload();
       }
       
     }
@@ -152,37 +158,86 @@ function getAllHours() {
   });
 }
 
+function getDaysOff() {
+  return new Promise(function(resolve, reject) {
+    
+    let transaction = db.transaction(['daysOff'], "readonly");
+    let objectStore = transaction.objectStore('daysOff');
+    
+    let request = objectStore.getAll();
+    
+    request.onsuccess = function() {
+      resolve(request.result);
+    }
+  
+  });
+}
+
 function calculateOvertime() {
   return new Promise(function(resolve, reject) {
     
-    getAllHours().then(function(dayResponse) {
+    getAllHours().then(function(daysResponse) {
       
-      console.log(dayResponse);
+      
+      console.log(daysResponse);
       
       let totalHours = 0;
       
-      let firstDate = new Date(dayResponse[0].date);
-      let lastDate;
+      let firstDate = new Date(daysResponse[0].date);
+      // let lastDate;
       let today = new Date(Date.now());
       
-      for (let currentDay in dayResponse) {
-        totalHours += dayResponse[currentDay].hours;
-        lastDate = new Date(dayResponse[currentDay].date);
-      }
-      
-      let hoursPerWeek = 11;    
-      // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
-      let totalDays = Math.round(Math.abs((firstDate.getTime() - today.getTime())/(24*60*60*1000)));
-      // let totalRequiredHours = totalDays*(hoursPerWeek/7);
-      let totalRequiredHours = Math.ceil(totalDays*(hoursPerWeek/7));
-      let overtime = totalHours - totalRequiredHours;
-      
-      console.log('Total Days: ' + totalDays);   
-      console.log('Required Hours: ' + totalRequiredHours);
-      console.log('Actual Hours: ' + totalHours);
-      console.log('Overtime: ' + overtime);
-      
-      resolve(overtime);
+      getDaysOff().then(daysOffResponse => {
+        
+        console.log(daysOffResponse);
+        let countDaysOff = 0;
+        for (let day in daysOffResponse) {
+          day = daysOffResponse[day];
+          let currentDate = new Date(day.startDate);
+          let difference = Math.round((currentDate.getTime() - firstDate.getTime())/(24*60*60*1000));
+          console.log(difference);
+          console.log(day, !(difference < 0 && (difference + day.timeOff) < 1));
+          
+          if (!((difference + day.timeOff) < 1)) {
+            if (difference < 0) {
+              countDaysOff += difference + day.timeOff; // difference is negative, add only the days that go beyond the first day
+            } else {
+              if (!(Math.round((today.getTime() - currentDate.getTime())/(24*60*60*1000))-day.timeOff+1 < 0)) { // holiday is not in the future
+                if (Math.round((today.getTime() - currentDate.getTime() + (day.timeOff-1)*86400000)/(24*60*60*1000)) < 0) { // some holidays in the future
+                  countDaysOff += day.timeOff + Math.round((today.getTime() - currentDate.getTime() + (day.timeOff-1)*86400000)/(24*60*60*1000)); // add remainder of holidays
+                } else {
+                  countDaysOff += day.timeOff
+                }
+              } 
+            }
+          }  
+        }
+        
+        globalAttributes.daysOff = countDaysOff;
+        
+      }).then(_ => {
+        
+          for (let currentDay in daysResponse) {
+            totalHours += daysResponse[currentDay].hours;
+            // lastDate = new Date(daysResponse[currentDay].date);
+          }
+          
+          let hoursPerWeek = 7;    
+          // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
+          console.log(globalAttributes.daysOff);
+          let totalDays = Math.round(Math.abs((firstDate.getTime() - today.getTime())/(24*60*60*1000))) - globalAttributes.daysOff;
+          // let totalRequiredHours = totalDays*(hoursPerWeek/7);
+          let totalRequiredHours = Math.ceil(totalDays/7)*hoursPerWeek;
+          let overtime = totalHours - totalRequiredHours;
+          
+          console.log('Total Days: ' + totalDays);   
+          console.log('Required Hours: ' + totalRequiredHours);
+          console.log('Actual Hours: ' + totalHours);
+          console.log('Overtime: ' + overtime);
+          
+          resolve(overtime);
+        
+      })
       
     });
     

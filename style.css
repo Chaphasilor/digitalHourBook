@@ -1,4 +1,4 @@
-:root {
+  :root {
   --hourDiffHeight: 20vh;
 }
 
@@ -18,7 +18,7 @@ html, body {
 #overtime {
   width: 100vw;
   height: var(--hourDiffHeight);
-  border: 3px solid red;
+  /* border: 3px solid red; */
   font-size: 2rem;
   line-height: var(--hourDiffHeight);
 }
@@ -26,7 +26,7 @@ html, body {
 .entryForm {
   width: 100vw;
   height: var(--hourDiffHeight);
-  border: 3px solid blue;
+  /* border: 3px solid blue; */
   font-size: 1.5rem;
 }
 
@@ -35,7 +35,7 @@ html, body {
   transition: height .5s;
   width: 100wv;
   height: 0;
-  border: 3px solid green;
+  /* border: 3px solid green; */
   font-size: 1.5rem;
   overflow-y: hidden;
 }
@@ -45,7 +45,7 @@ html, body {
   font-size: 1rem;
   margin: auto;
   height: var(--hourDiffHeight);
-  border: 2px dashed black;
+  /* border: 2px dashed black; */
   background-color: white;
 }
 
