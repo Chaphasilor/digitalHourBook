@@ -105,7 +105,7 @@
       }).then(function (response) {
         let events = response.result.items;
         events = events.filter(event => event.summary == "GSI");
-        document.body.append(events);
+        document.body.append(JSON.stringify(events));
       });
     }
 
