@@ -106,7 +106,7 @@
         let events = response.result.items;
         events = events.filter(event => event.summary == "GSI");
         for (let event of events) {
-          document.body.append(JSON.stringify(event));
+          document.body.append((new Date(event.start.dateTime)).toLocaleDateString() + ": " + (Math.abs((new Date(event.end.dateTime)) - (new Date(event.start.dateTime)) / 3600000).toFixed(2)));
         }
       });
     }
