@@ -1,12 +1,4 @@
-node_modules/ics-to-json/.travis.yml
-node_modules/ics-to-json/babel.config.js
-node_modules/ics-to-json/dist.js
-node_modules/ics-to-json/icsToJson.js
-node_modules/ics-to-json/icsToJson.test.js
-node_modules/ics-to-json/jest.config.js
-node_modules/ics-to-json/package.json
-node_modules/ics-to-json/readme.md
-node_modules/ics-to-json/yarn.lock
+node_modules/
 calendar.ics
 client_id.json
 credentials.json
