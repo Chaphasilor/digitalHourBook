@@ -8,6 +8,8 @@ function initUI() {
 
     console.log(response);
 
+    updateUI();
+
   });
 
 }
