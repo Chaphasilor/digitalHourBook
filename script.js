@@ -298,6 +298,8 @@ function loadGoogleCalendarData() {
 
 function parseGoogleCalendarData(events) {
 
+  console.log(events);
+
   events.map(async event => await addDay(event.date, date.duration));
 
   updateUI();
