@@ -309,3 +309,41 @@ function parseGoogleCalendarData(events) {
   document.querySelector('#gcLoader').remove();
 
 }
+
+async function exportToProzHelper(month) {
+
+  let allDays = await getAllHours();
+
+  let monthDays = allDays.filter(day => {
+
+    return (new Date(day.date)).getMonth() == month;
+
+  });
+
+  let outputString = "";
+
+  outputString += ";;6220";
+  outputString += "\n";
+
+  outputString += "\n";
+
+  for (let day of monthDays) {
+
+    outputString += day.date.getYear() + '-';
+    outputString += day.date.getMonth() < 9 ? "0" + parseInt(day.date.getMonth()) + parseInt(1) : parseInt(day.date.getMonth()) + parseInt(1);
+    outputString += '-';
+    outputString += day.date.getDate();
+
+    outputString += ';';
+
+    outputString += day.hours;
+
+    outputString += "\n";
+
+  }
+
+  alert(outputString);
+
+  return outputString;
+
+}
