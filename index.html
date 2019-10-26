@@ -1,71 +1,78 @@
 <!DOCTYPE html>
 <html lang='en' dir='ltr'>
-  <head>
-    
-    <meta charset='utf-8'>
-    
-    <title>Digital Hour Book</title>
-    
-    <link rel='stylesheet' href='style.css'>
-    <script type='text/javascript' src='script.js'>
-      
-    </script>
-    
-  </head>
-  <body>
-    
-    <div id='overtime'>
-      <span>not available</span>
-    </div>
-    
-    <button id='addWorkingHours' class='entryForm' type='button' onclick="newHoursEntry();">Add working hours</button>
-      
-    <form id='hoursEntry' action='' onsubmit="event.preventDefault();this.style.height='0';addDay(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
-      
-      <input type='date' name='date' value="" />
-      
-      <input type='text' name='amount' value='4' />
-      
-      <input type='submit' value='Submit' />
-    
-    </form>
-    
-    <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
-      
-    <form id='holidaysEntry' action='' onsubmit="event.preventDefault();this.style.height='0';addHolidays(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
-      
-      <input type='date' name='date' value="" />
-      
-      <input type='text' name='timeOff' value='1' />
-      
-      <input type='submit' value='Submit' />
-    
-    </form>
-      
-    <script type="text/javascript">
-      
-      window.onload = function() {
-        
-        document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
-        
-        initDB().then(function(response) {
-          
-          console.log(response);
-          
-          calculateOvertime().then(function(overtime) {
-            
-            let overtimeSpan = document.querySelector('#overtime').querySelector('span');
-            overtimeSpan.innerHTML = overtime;
-            
-            overtime<0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
-            
-          });
-          
-        })
-        
-      }
-      
-    </script>
-      
-  </body>
+
+<head>
+
+  <meta charset='utf-8'>
+
+  <title>Digital Hour Book</title>
+
+  <link rel='stylesheet' href='style.css'>
+  <script type='text/javascript' src='script.js'>
+
+  </script>
+
+</head>
+
+<body>
+
+  <div id='overtime'>
+    <span>not available</span>
+  </div>
+
+  <button id='addWorkingHours' class='entryForm' type='button' onclick="newHoursEntry();">Add working hours</button>
+
+  <form id='hoursEntry' action=''
+    onsubmit="event.preventDefault();this.style.height='0';addDay(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+
+    <input type='date' name='date' value="" />
+
+    <input type='text' name='amount' value='4' />
+
+    <input type='submit' value='Submit' />
+
+  </form>
+
+  <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
+
+  <form id='holidaysEntry' action=''
+    onsubmit="event.preventDefault();this.style.height='0';addHolidays(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+
+    <input type='date' name='date' value="" />
+
+    <input type='text' name='timeOff' value='1' />
+
+    <input type='submit' value='Submit' />
+
+  </form>
+
+  <iframe src="googleIsolator.html" frameborder="0" width='500' height='800'></iframe>
+
+  <script type="text/javascript">
+
+    window.onload = function () {
+
+      document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
+
+      initDB().then(function (response) {
+
+        console.log(response);
+
+        calculateOvertime().then(function (overtime) {
+
+          let overtimeSpan = document.querySelector('#overtime').querySelector('span');
+          overtimeSpan.innerHTML = overtime;
+
+          overtime < 0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
+
+        });
+
+      })
+
+    }
+
+  </script>
+
+</body>
+
 </html>
