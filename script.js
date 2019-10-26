@@ -1,5 +1,30 @@
 var globalAttributes = {};
 
+function initUI() {
+
+  document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
+
+  initDB().then(function (response) {
+
+    console.log(response);
+
+  });
+
+}
+
+function updateUI() {
+
+  calculateOvertime().then(function (overtime) {
+
+    let overtimeSpan = document.querySelector('#overtime').querySelector('span');
+    overtimeSpan.innerHTML = overtime;
+
+    overtime < 0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
+
+  });
+
+}
+
 Date.prototype.toDateInputValue = (function () {
   var local = new Date(this);
   local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
@@ -87,26 +112,29 @@ function getDay(date) {
 }
 
 function addDay(date, hours) {
+  return new Promise((resolve, reject) => {
 
-  if (isNaN(hours)) {
-    alert("The amount of hours you put is not a number!");
-  } else {
+    if (isNaN(hours)) {
+      alert("The amount of hours you put is not a number!");
+    } else {
 
-    let tx = db.transaction(['days'], "readwrite");
-    let txObj = tx.objectStore('days');
+      let tx = db.transaction(['days'], "readwrite");
+      let txObj = tx.objectStore('days');
 
-    console.log(date + ", " + hours);
-    let request = txObj.put({ date: date, hours: Number(hours) });
+      console.log(date + ", " + hours);
+      let request = txObj.put({ date: date, hours: Number(hours) });
 
-    request.onsuccess = function () {
+      request.onsuccess = function () {
 
-      console.log("Success");
-      window.location.reload();
+        console.log("Success");
+        // window.location.reload();
+        resolve();
+
+      };
 
     }
 
-  }
-
+  });
 }
 
 function deleteDay(date) {
@@ -136,7 +164,7 @@ function addHolidays(date, timeOff) {
 
     request.onsuccess = function () {
       console.log("Success!");
-      window.location.reload();
+      // window.location.reload();
     }
 
   }
@@ -254,5 +282,26 @@ function importHours(hoursAsJson) {
   for (const date of hoursAsObject) {
     addDay(date.date, date.hours[0].hours);
   }
+
+}
+
+function loadGoogleCalendarData() {
+
+  let frame = document.createElement('iframe');
+  frame.src = 'googleIsolator.html';
+  frame.style.display = 'none';
+  frame.id = 'gcLoader';
+
+  document.body.appendChild(frame);
+
+}
+
+function parseGoogleCalendarData(events) {
+
+  events.map(async event => await addDay(event.date, date.duration));
+
+  updateUI();
+
+  document.querySelector('#gcLoader').remove();
 
 }

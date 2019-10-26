@@ -8,9 +8,6 @@
   <title>Digital Hour Book</title>
 
   <link rel='stylesheet' href='style.css'>
-  <script type='text/javascript' src='script.js'>
-
-  </script>
 
 </head>
 
@@ -48,27 +45,12 @@
 
   <iframe src="googleIsolator.html" frameborder="0" width='500' height='800'></iframe>
 
-  <script type="text/javascript">
+  <script type='text/javascript' src='script.js'></script>
+
+  <script>
 
     window.onload = function () {
-
-      document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
-
-      initDB().then(function (response) {
-
-        console.log(response);
-
-        calculateOvertime().then(function (overtime) {
-
-          let overtimeSpan = document.querySelector('#overtime').querySelector('span');
-          overtimeSpan.innerHTML = overtime;
-
-          overtime < 0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
-
-        });
-
-      })
-
+      initUI();
     }
 
   </script>
