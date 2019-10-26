@@ -38,8 +38,8 @@ function initClient() {
     updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
     handleAuthClick();
     // authorizeButton.onclick = handleAuthClick;
-    signoutButton.onclick = handleSignoutClick;
-    detailsButton.onclick = handleDetailsClick;
+    // signoutButton.onclick = handleSignoutClick;
+    // detailsButton.onclick = handleDetailsClick;
   }, function (error) {
     appendPre(JSON.stringify(error, null, 2));
   });
@@ -88,9 +88,10 @@ function handleDetailsClick(event) {
   }).then(function (response) {
     let events = response.result.items;
     events = events.filter(event => event.summary == "GSI");
-    for (let event of events) {
-      appendPre((new Date(event.start.dateTime)).toLocaleDateString() + ": " + (Math.abs(((new Date(event.end.dateTime)) - (new Date(event.start.dateTime))) / 3600000).toFixed(2)));
+    for (let o in events) {
+      events[o] = { date: (new Date(event.start.dateTime)).toJSON(), duration: (Math.abs(((new Date(event.end.dateTime)) - (new Date(event.start.dateTime))) / 3600000).toFixed(2)) };
     }
+    appendPre(JSON.stringify({ events }));
   });
 }
 
