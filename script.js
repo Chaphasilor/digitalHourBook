@@ -300,7 +300,7 @@ function parseGoogleCalendarData(events) {
 
   console.log(events);
 
-  events.map(async event => await addDay(event.date, date.duration));
+  events.map(async event => await addDay(event.date, event.duration));
 
   updateUI();
 
