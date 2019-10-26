@@ -97,7 +97,7 @@ function handleDetailsClick(event) {
       events[o] = { date: (new Date(events[o].start.dateTime)), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)) };
     }
     appendPre(JSON.stringify({ events }));
-    parseGoogleCalendarData(events);
+    window.parent.parseGoogleCalendarData(events);
   });
 }
 
