@@ -9,9 +9,9 @@ var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/
 // included, separated by spaces.
 var SCOPES = "https://www.googleapis.com/auth/calendar.events.readonly";
 
-var authorizeButton = document.getElementById('authorize_button');
-var signoutButton = document.getElementById('signout_button');
-var detailsButton = document.getElementById('details_button');
+// var authorizeButton = document.getElementById('authorize_button');
+// var signoutButton = document.getElementById('signout_button');
+// var detailsButton = document.getElementById('details_button');
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -51,15 +51,15 @@ function initClient() {
  */
 function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
-    authorizeButton.style.display = 'none';
-    signoutButton.style.display = 'block';
-    detailsButton.style.display = 'block';
+    // authorizeButton.style.display = 'none';
+    // signoutButton.style.display = 'block';
+    // detailsButton.style.display = 'block';
     // listUpcomingEvents();
     handleDetailsClick();
   } else {
-    authorizeButton.style.display = 'block';
-    signoutButton.style.display = 'none';
-    detailsButton.style.display = 'none';
+    // authorizeButton.style.display = 'block';
+    // signoutButton.style.display = 'none';
+    // detailsButton.style.display = 'none';
   }
 }
 
@@ -89,8 +89,7 @@ function handleDetailsClick(event) {
     let events = response.result.items;
     events = events.filter(event => event.summary == "GSI");
     for (let event of events) {
-      document.body.append((new Date(event.start.dateTime)).toLocaleDateString() + ": " + (Math.abs(((new Date(event.end.dateTime)) - (new Date(event.start.dateTime))) / 3600000).toFixed(2)));
-      document.body.append(document.createElement('br'));
+      appendPre((new Date(event.start.dateTime)).toLocaleDateString() + ": " + (Math.abs(((new Date(event.end.dateTime)) - (new Date(event.start.dateTime))) / 3600000).toFixed(2)));
     }
   });
 }
@@ -107,34 +106,34 @@ function appendPre(message) {
   pre.appendChild(textContent);
 }
 
-/**
- * Print the summary and start datetime/date of the next ten events in
- * the authorized user's calendar. If no events are found an
- * appropriate message is printed.
- */
-function listUpcomingEvents() {
-  gapi.client.calendar.events.list({
-    'calendarId': 'primary',
-    'timeMin': (new Date()).toISOString(),
-    'showDeleted': false,
-    'singleEvents': true,
-    'maxResults': 10,
-    'orderBy': 'startTime'
-  }).then(function (response) {
-    var events = response.result.items;
-    appendPre('Upcoming events:');
+// /**
+//  * Print the summary and start datetime/date of the next ten events in
+//  * the authorized user's calendar. If no events are found an
+//  * appropriate message is printed.
+//  */
+// function listUpcomingEvents() {
+//   gapi.client.calendar.events.list({
+//     'calendarId': 'primary',
+//     'timeMin': (new Date()).toISOString(),
+//     'showDeleted': false,
+//     'singleEvents': true,
+//     'maxResults': 10,
+//     'orderBy': 'startTime'
+//   }).then(function (response) {
+//     var events = response.result.items;
+//     appendPre('Upcoming events:');
 
-    if (events.length > 0) {
-      for (i = 0; i < events.length; i++) {
-        var event = events[i];
-        var when = event.start.dateTime;
-        if (!when) {
-          when = event.start.date;
-        }
-        appendPre(event.summary + ' (' + when + ')')
-      }
-    } else {
-      appendPre('No upcoming events found.');
-    }
-  });
-}
+//     if (events.length > 0) {
+//       for (i = 0; i < events.length; i++) {
+//         var event = events[i];
+//         var when = event.start.dateTime;
+//         if (!when) {
+//           when = event.start.date;
+//         }
+//         appendPre(event.summary + ' (' + when + ')')
+//       }
+//     } else {
+//       appendPre('No upcoming events found.');
+//     }
+//   });
+// }
