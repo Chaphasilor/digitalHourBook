@@ -331,7 +331,7 @@ async function exportToProzHelper(month) {
     for (let day of monthDays) {
 
       outputString += day.date.getFullYear() + '-';
-      outputString += day.date.getMonth() < 9 ? 0 + parseInt(day.date.getMonth()) + parseInt(1) : parseInt(day.date.getMonth()) + parseInt(1);
+      outputString += day.date.getMonth() < 9 ? '0' +(parseInt(day.date.getMonth()) + parseInt(1)): parseInt(day.date.getMonth()) + parseInt(1);
       outputString += '-';
       outputString += day.date.getDate();
 
