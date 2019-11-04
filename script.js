@@ -337,7 +337,11 @@ async function exportToProzHelper(month) {
 
       outputString += ';';
 
-      outputString += day.hours;
+      outputString += day.hours; // total hours
+
+      outputString += ';';
+
+      outputString += day.hours; // projectd hours
 
       outputString += "\n";
 
