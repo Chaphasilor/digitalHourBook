@@ -155,7 +155,7 @@ function deleteDay(date) {
 function addHolidays(date, timeOff) {
 
   if (isNaN(timeOff)) {
-    alert("The amount of days off you've put is not a number!");
+    alert("The amount of days of you've put is not a number!");
   } else {
 
     let tx = db.transaction(['daysOff'], "readwrite");
@@ -342,7 +342,7 @@ async function exportToProzHelper(month) {
 
   }
 
-  alert(outputString);
+  // alert(outputString);
 
   return outputString;
 
