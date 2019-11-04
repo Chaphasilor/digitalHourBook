@@ -25,7 +25,7 @@
             <option value="11">December</option>
         </select>
 
-        <button type="button" onclick="document.querySelector('#output').innerHTML = await exportToProzHelper(document.querySelector('#month').value);">Export to Proz</button>
+        <button type="button" onclick="exportToProzHelper(document.querySelector('#month').value).then(data => document.querySelector('#output').innerHTML=data);">Export to Proz</button>
         
     </form>
 

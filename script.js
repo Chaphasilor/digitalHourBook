@@ -311,39 +311,41 @@ function parseGoogleCalendarData(events) {
 }
 
 async function exportToProzHelper(month) {
+  return new Promise((resolve, reject) => {
+  
+    let allDays = await getAllHours();
 
-  let allDays = await getAllHours();
+    let monthDays = allDays.filter(day => {
 
-  let monthDays = allDays.filter(day => {
+      return (new Date(day.date)).getMonth() == month;
 
-    return (new Date(day.date)).getMonth() == month;
+    });
 
-  });
+    let outputString = "";
 
-  let outputString = "";
-
-  outputString += ";;6220";
-  outputString += "\n";
-
-  outputString += "\n";
-
-  for (let day of monthDays) {
-
-    outputString += day.date.getFullYear() + '-';
-    outputString += day.date.getMonth() < 9 ? "0" + parseInt(day.date.getMonth()) + parseInt(1) : parseInt(day.date.getMonth()) + parseInt(1);
-    outputString += '-';
-    outputString += day.date.getDate();
-
-    outputString += ';';
-
-    outputString += day.hours;
+    outputString += ";;6220";
+    outputString += "\n";
 
     outputString += "\n";
 
-  }
+    for (let day of monthDays) {
 
-  // alert(outputString);
+      outputString += day.date.getFullYear() + '-';
+      outputString += day.date.getMonth() < 9 ? "0" + parseInt(day.date.getMonth()) + parseInt(1) : parseInt(day.date.getMonth()) + parseInt(1);
+      outputString += '-';
+      outputString += day.date.getDate();
 
-  return outputString;
+      outputString += ';';
 
+      outputString += day.hours;
+
+      outputString += "\n";
+
+    }
+
+    // alert(outputString);
+
+    resolve(outputString);
+  
+  })
 }
