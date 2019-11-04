@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Export</title>
+</head>
+<body>
+    
+    <form>
+        
+        <select id="month">
+            <option value="0">January</option>
+            <option value="1">Feburary</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+        </select>
+
+        <button type="button" onclick="exportToProzHelper(document.getElementById('month').value);">Export to Proz</button>
+        
+    </form>
+    
+    <script>
+
+      window.onload = function() {
+        initDB();
+      }
+
+    </script>
+    
+    <script src="script.js"></script>
+    
+</body>
+</html>
