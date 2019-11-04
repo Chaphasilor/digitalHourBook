@@ -311,7 +311,7 @@ function parseGoogleCalendarData(events) {
 }
 
 async function exportToProzHelper(month) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
   
     let allDays = await getAllHours();
 
