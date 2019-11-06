@@ -114,30 +114,22 @@ function addDay(date, hours) {
       alert("The amount of hours you put is not a number!");
     } else {
       
-      console.log('date:', date);
       date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      console.log('date:', date);
-      // console.log(date + ", " + hours);
+      console.log(date + ", " + hours);
 
       let foundEntry;
       try {
         foundEntry = await getDay(date);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         foundEntry = null;
       }
-      console.log('foundEntry:', foundEntry);
-
-      console.log('hours:', hours);
 
       if (foundEntry != null) {
 
         hours = Number(hours)+Number(foundEntry.hours);
         
       }
-
-      console.log('hours:', hours);
-
 
       let tx = db.transaction(['days'], "readwrite");
       let txObj = tx.objectStore('days');
@@ -319,8 +311,6 @@ function parseGoogleCalendarData(events) {
   return new Promise(async (resolve, reject) => {
   
     console.log(events);
-
-    // events.map(async event => await addDay(event.date, event.duration));
 
     for (const event of events) {
       await addDay(event.date, event.duration);
