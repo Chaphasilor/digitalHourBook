@@ -121,6 +121,7 @@ function addDay(date, hours) {
       try {
         foundEntry = await getDay(date);
       } catch (err) {
+        // console.error(err);
         foundEntry = null;
       }
 
@@ -129,7 +130,6 @@ function addDay(date, hours) {
         hours = Number(hours)+Number(foundEntry.hours);
         
       }
-
 
       let tx = db.transaction(['days'], "readwrite");
       let txObj = tx.objectStore('days');
@@ -308,15 +308,27 @@ function loadGoogleCalendarData() {
 }
 
 function parseGoogleCalendarData(events) {
+  return new Promise(async (resolve, reject) => {
+  
+    console.log(events);
 
-  console.log(events);
+    for (const event of events) {
+      await addDay(event.date, event.duration);
+    }
+  
+  })
+}
 
-  events.map(async event => await addDay(event.date, event.duration));
+function parseGoogleCalendarDataCallback(events) {
 
-  updateUI();
+  parseGoogleCalendarData(events).then(_ => {
 
-  document.querySelector('#gcLoader').remove();
+    updateUI();
 
+    document.querySelector('#gcLoader').remove();
+    
+  })
+  
 }
 
 async function exportToProzHelper(month) {
