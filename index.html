@@ -20,7 +20,7 @@
   <button id='addWorkingHours' class='entryForm' type='button' onclick="newHoursEntry();">Add working hours</button>
 
   <form id='hoursEntry' action=''
-    onsubmit="event.preventDefault();this.style.height='0';addDay(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+    onsubmit="event.preventDefault();this.style.height='0';addDay(new Date(this.getElementsByTagName('input')[0].value), this.getElementsByTagName('input')[1].value);">
 
     <input type='date' name='date' value="" />
 
@@ -33,7 +33,7 @@
   <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
 
   <form id='holidaysEntry' action=''
-    onsubmit="event.preventDefault();this.style.height='0';addHolidays(this.getElementsByTagName('input')[0].value, this.getElementsByTagName('input')[1].value);">
+    onsubmit="event.preventDefault();this.style.height='0';addHolidays(new Date(this.getElementsByTagName('input')[0].value), this.getElementsByTagName('input')[1].value);">
 
     <input type='date' name='date' value="" />
 
