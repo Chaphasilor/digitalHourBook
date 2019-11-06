@@ -114,7 +114,9 @@ function addDay(date, hours) {
       alert("The amount of hours you put is not a number!");
     } else {
       
+      console.log('date:', date);
       date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      console.log('date:', date);
       console.log(date + ", " + hours);
 
       let foundEntry;
