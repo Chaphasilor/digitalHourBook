@@ -117,7 +117,7 @@ function addDay(date, hours) {
       console.log('date:', date);
       date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       console.log('date:', date);
-      console.log(date + ", " + hours);
+      // console.log(date + ", " + hours);
 
       let foundEntry;
       try {
@@ -125,12 +125,17 @@ function addDay(date, hours) {
       } catch (err) {
         foundEntry = null;
       }
+      console.log('foundEntry:', foundEntry);
+
+      console.log('hours:', hours);
 
       if (foundEntry != null) {
 
         hours = Number(hours)+Number(foundEntry.hours);
         
       }
+
+      console.log('hours:', hours);
 
 
       let tx = db.transaction(['days'], "readwrite");
