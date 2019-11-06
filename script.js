@@ -123,6 +123,7 @@ function addDay(date, hours) {
       try {
         foundEntry = await getDay(date);
       } catch (err) {
+        console.error(err);
         foundEntry = null;
       }
       console.log('foundEntry:', foundEntry);
@@ -315,15 +316,29 @@ function loadGoogleCalendarData() {
 }
 
 function parseGoogleCalendarData(events) {
+  return new Promise(async (resolve, reject) => {
+  
+    console.log(events);
 
-  console.log(events);
+    // events.map(async event => await addDay(event.date, event.duration));
 
-  events.map(async event => await addDay(event.date, event.duration));
+    for (const event of events) {
+      await addDay(event.date, event.duration);
+    }
+  
+  })
+}
 
-  updateUI();
+function parseGoogleCalendarDataCallback(events) {
 
-  document.querySelector('#gcLoader').remove();
+  parseGoogleCalendarData(events).then(_ => {
 
+    updateUI();
+
+    document.querySelector('#gcLoader').remove();
+    
+  })
+  
 }
 
 async function exportToProzHelper(month) {
