@@ -2,8 +2,6 @@ var globalAttributes = {};
 
 function initUI() {
 
-  document.querySelector('#hoursEntry').querySelector("input[type='date']").value = new Date().toDateInputValue();
-
   initDB().then(function (response) {
 
     console.log(response);
@@ -26,12 +24,6 @@ function updateUI() {
   });
 
 }
-
-Date.prototype.toDateInputValue = (function () {
-  var local = new Date(this);
-  local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-  return local.toJSON().slice(0, 10);
-});
 
 function newHoursEntry() {
 
@@ -95,35 +87,52 @@ function initDB() {
 }
 
 function getDay(date) {
+  return new Promise((resolve, reject) => {
+  
+    let tx = db.transaction(['days'], "readonly");
+    let txObj = tx.objectStore('days');
 
-  let tx = db.transaction(['days'], "readonly");
-  let txObj = tx.objectStore('days');
-
-  let request = txObj.get(date);
-  request.onsuccess = function () {
-    let matching = request.result;
-    if (matching !== undefined) {
-      // A match was found.
-      console.log(matching.date + ", " + matching.hours);
-    } else {
-      // No match was found.
-      console.log("No matching record!");
-    }
-  };
-
+    let request = txObj.get(date);
+    request.onsuccess = function () {
+      let matching = request.result;
+      if (matching !== undefined) {
+        // A match was found.
+        resolve(matching);
+      } else {
+        // No match was found.
+        reject('No match was found');
+      }
+    };
+  
+  })
 }
 
 function addDay(date, hours) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     if (isNaN(hours)) {
       alert("The amount of hours you put is not a number!");
     } else {
+      
+      date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      console.log(date + ", " + hours);
+
+      let foundEntry;
+      try {
+        foundEntry = await getDay(date);
+      } catch (err) {
+        foundEntry = null;
+      }
+
+      if (foundEntry != null) {
+
+        hours = Number(hours)+Number(foundEntry.hours);
+        
+      }
+
 
       let tx = db.transaction(['days'], "readwrite");
       let txObj = tx.objectStore('days');
-
-      console.log(date + ", " + hours);
       let request = txObj.put({ date: date, hours: Number(hours) });
 
       request.onsuccess = function () {
