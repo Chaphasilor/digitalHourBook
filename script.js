@@ -360,8 +360,8 @@ async function exportToProzHelper(year, month) {
       //TODO add all days to an array, check if actual date exists in monthDays
       console.log('i:', i);
       console.log('fullMonthArray:', fullMonthArray);
-      console.log('monthDays[0].date.getDay():', monthDays[0].date.getDay());
-      fullMonthArray[i-1] = monthDays[0].date.getDay()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
+      console.log('monthDays[0].date.getDate():', monthDays[0].date.getDate());
+      fullMonthArray[i-1] = monthDays[0].date.getDate()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
       i++;
       
     }
