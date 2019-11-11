@@ -331,14 +331,14 @@ function parseGoogleCalendarDataCallback(events) {
   
 }
 
-async function exportToProzHelper(month) {
+async function exportToProzHelper(year, month) {
   return new Promise(async (resolve, reject) => {
   
     let allDays = await getAllHours();
 
     let monthDays = allDays.filter(day => {
 
-      return (new Date(day.date)).getMonth() == month;
+      return ((new Date(day.date)).getMonth() == month) && ((new Date(day.date)).getFullYear() == year);
 
     });
 
@@ -349,7 +349,18 @@ async function exportToProzHelper(month) {
 
     outputString += "\n";
 
-    for (let day of monthDays) {
+    let i = 1; // days start with 1
+
+    let fullMonthArray = [];
+
+    while ((new Date(year, month, i)).getMonth() == month) {
+      //TODO add all days to an array, check if actual date exists in monthDays
+      console.log('monthDays:', monthDays);
+      fullMonthArray[i-1] = monthDays[0].date.getDay()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
+      
+    }
+
+    for (let day of fullMonthArray) {
 
       outputString += day.date.getFullYear() + '-';
       outputString += day.date.getMonth() < 9 ? '0' +(parseInt(day.date.getMonth()) + parseInt(1)): parseInt(day.date.getMonth()) + parseInt(1);
@@ -362,7 +373,7 @@ async function exportToProzHelper(month) {
 
       outputString += ';';
 
-      outputString += day.hours; // projectd hours
+      outputString += day.hours; // project hours
 
       outputString += "\n";
 
