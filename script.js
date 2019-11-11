@@ -357,6 +357,7 @@ async function exportToProzHelper(year, month) {
       //TODO add all days to an array, check if actual date exists in monthDays
       console.log('monthDays:', monthDays);
       fullMonthArray[i-1] = monthDays[0].date.getDay()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
+      i++;
       
     }
 
