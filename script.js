@@ -363,6 +363,8 @@ async function exportToProzHelper(year, month) {
       if (monthDays.length > 0) {
         console.log('monthDays[0].date.getDate():', monthDays[0].date.getDate());
         fullMonthArray[i-1] = monthDays[0].date.getDate()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
+      } else {
+        fullMonthArray[i-1] = {date: new Date(year, month, i), hours: 0};
       }
       i++;
       
