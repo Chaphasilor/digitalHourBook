@@ -315,6 +315,8 @@ function parseGoogleCalendarData(events) {
     for (const event of events) {
       await addDay(event.date, event.duration);
     }
+
+    resolve();
   
   })
 }
