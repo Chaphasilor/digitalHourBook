@@ -395,3 +395,44 @@ async function exportToProzHelper(year, month) {
   
   })
 }
+
+/**
+ * Can be used to show a dialog to the user asking which calendar provider they want to sync with, once more providers are implemented.
+ *
+ * @returns an integer representing the calendar
+ */
+function chooseCalendarProvider() {
+  return 'googleCalendar';
+}
+
+function sync(overwrite = true) {
+
+  if (overwrite) {
+
+    let transaction = db.transaction(['days'], "readwrite");
+    let objectStore = transaction.objectStore('days');
+
+    let request = objectStore.clear();
+
+    request.onsuccess = function initSync() {
+
+      let cal = chooseCalendarProvider();
+
+      switch (cal) {
+        case 'googleCalendar':
+          loadGoogleCalendarData();
+          break;
+
+        default:
+          break;
+      }
+      
+    }
+
+    request.onerror = function() {
+      confirm("Old records couldn't be erased, sync anyway?") ? initSync() : false;
+    }
+    
+  }
+  
+}
