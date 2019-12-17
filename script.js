@@ -315,6 +315,8 @@ function parseGoogleCalendarData(events) {
     for (const event of events) {
       await addDay(event.date, event.duration);
     }
+
+    resolve();
   
   })
 }
@@ -331,14 +333,14 @@ function parseGoogleCalendarDataCallback(events) {
   
 }
 
-async function exportToProzHelper(month) {
+async function exportToProzHelper(year, month) {
   return new Promise(async (resolve, reject) => {
   
     let allDays = await getAllHours();
 
     let monthDays = allDays.filter(day => {
 
-      return (new Date(day.date)).getMonth() == month;
+      return ((new Date(day.date)).getMonth() == month) && ((new Date(day.date)).getFullYear() == year);
 
     });
 
@@ -349,7 +351,28 @@ async function exportToProzHelper(month) {
 
     outputString += "\n";
 
-    for (let day of monthDays) {
+    let i = 1; // days start with 1
+
+    let fullMonthArray = [];
+
+    let test = [...monthDays];
+    console.log('test:', test);
+
+    while ((new Date(year, month, i)).getMonth() == month) {
+      //TODO add all days to an array, check if actual date exists in monthDays
+      console.log('i:', i);
+      console.log('fullMonthArray:', fullMonthArray);
+      if (monthDays.length > 0) {
+        console.log('monthDays[0].date.getDate():', monthDays[0].date.getDate());
+        fullMonthArray[i-1] = monthDays[0].date.getDate()==i ? monthDays.shift() : {date: new Date(year, month, i), hours: 0};
+      } else {
+        fullMonthArray[i-1] = {date: new Date(year, month, i), hours: 0};
+      }
+      i++;
+      
+    }
+
+    for (let day of fullMonthArray) {
 
       outputString += day.date.getFullYear() + '-';
       outputString += day.date.getMonth() < 9 ? '0' +(parseInt(day.date.getMonth()) + parseInt(1)): parseInt(day.date.getMonth()) + parseInt(1);
@@ -362,7 +385,7 @@ async function exportToProzHelper(month) {
 
       outputString += ';';
 
-      outputString += day.hours; // projectd hours
+      outputString += day.hours; // project hours
 
       outputString += "\n";
 
@@ -373,4 +396,45 @@ async function exportToProzHelper(month) {
     resolve(outputString);
   
   })
+}
+
+/**
+ * Can be used to show a dialog to the user asking which calendar provider they want to sync with, once more providers are implemented.
+ *
+ * @returns an integer representing the calendar
+ */
+function chooseCalendarProvider() {
+  return 'googleCalendar';
+}
+
+function sync(overwrite = true) {
+
+  if (overwrite) {
+
+    let transaction = db.transaction(['days'], "readwrite");
+    let objectStore = transaction.objectStore('days');
+
+    let request = objectStore.clear();
+
+    request.onsuccess = function initSync() {
+
+      let cal = chooseCalendarProvider();
+
+      switch (cal) {
+        case 'googleCalendar':
+          loadGoogleCalendarData();
+          break;
+
+        default:
+          break;
+      }
+      
+    }
+
+    request.onerror = function() {
+      confirm("Old records couldn't be erased, sync anyway?") ? initSync() : false;
+    }
+    
+  }
+  
 }
