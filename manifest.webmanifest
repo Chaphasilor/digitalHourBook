@@ -1,0 +1,11 @@
+{
+  "name": "Digital Hour Book",
+  "short_name": "Hour Book",
+  "start_url": ".",
+  "display": "minimal-ui",
+  "background_color": "#ffffff",
+  "description": "A digital hour book to manage working hours and overtime",
+  "permissions": [
+    "clipboardWrite",
+  ],
+}

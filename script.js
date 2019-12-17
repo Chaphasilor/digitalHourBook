@@ -438,3 +438,13 @@ function sync(overwrite = true) {
   }
   
 }
+
+function updateClipboard(newClip) {
+  navigator.clipboard.writeText(newClip).then(function() {
+    document.body.innerHTML += "<span style='color: green;'>Data copied!</span>";
+    /* clipboard successfully set */
+  }, function() {
+    alert('Writing to clipboard not allowed, please copy the data manually!')
+    /* clipboard write failed */
+  });
+}
