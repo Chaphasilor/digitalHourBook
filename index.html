@@ -25,11 +25,11 @@
   <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
 
   <form id='holidaysEntry' action=''
-    onsubmit="event.preventDefault();this.style.height='0';addHolidays(new Date(this.getElementsByTagName('input')[0].value), this.getElementsByTagName('input')[1].value);">
+    onsubmit="event.preventDefault();this.style.height='0';addHoursOff(new Date(this.getElementsByTagName('input')[0].value), this.getElementsByTagName('input')[1].value);">
 
     <input type='date' name='date' value="" />
 
-    <input type='text' name='timeOff' value='1' />
+    <input type='text' name='hoursOff' value='1' />
 
     <input type='submit' value='Submit' />
 
