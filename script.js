@@ -42,7 +42,7 @@ var db;
 function initDB() {
   return new Promise(function (resolve, reject) {
 
-    var request = window.indexedDB.open("hourBook", 4);
+    var request = window.indexedDB.open("hourBook", 5);
 
     request.onsuccess = function (event) {
 
@@ -67,16 +67,13 @@ function initDB() {
       try {
         let days = db.createObjectStore("days", { keyPath: "date" });
         let hours = days.createIndex("by_hours", "hours", { unique: false });
-        let firstDay = '2018-10-22'; // The first working day ever
-        let firstDayHours = 2 // The amount of hours you've worked on your first day
-        // addRecord(firstDay, firstDayHours);
       } catch (e) {
         console.log("Object store already exists");
       }
 
       try {
-        let holidays = db.createObjectStore("daysOff", { keyPath: "startDate" });
-        let timeOff = holidays.createIndex("by_timeOff", "timeOff", { unique: false });
+        let holidays = db.createObjectStore("hoursOff", { keyPath: "date" });
+        let timeOff = holidays.createIndex("by_hours", "hours", { unique: false });
       } catch (e) {
         console.log("Object store already exists");
       }
@@ -135,13 +132,7 @@ function addDay(date, hours) {
       let txObj = tx.objectStore('days');
       let request = txObj.put({ date: date, hours: Number(hours) });
 
-      request.onsuccess = function () {
-
-        console.log("Success");
-        // window.location.reload();
-        resolve();
-
-      };
+      request.onsuccess = () => resolve();
 
     }
 
@@ -149,37 +140,55 @@ function addDay(date, hours) {
 }
 
 function deleteDay(date) {
+  return new Promise((resolve, reject) => {
+    
+    let tx = db.transaction(['days'], "readwrite");
+    let txObj = tx.objectStore('days');
+  
+    let request = txObj.delete(date);
+  
+    request.onsuccess = () => resolve();
 
-  let tx = db.transaction(['days'], "readwrite");
-  let txObj = tx.objectStore('days');
-
-  let request = txObj.delete(date);
-
-  request.onsuccess = function () {
-    console.log("Success!");
-  }
-
+    request.onerror = (err) => reject(err);
+  
+  })
 }
 
-function addHolidays(date, timeOff) {
+function addHoursOff(date, hours) {
+  return new Promise((resolve, reject) => {
+  
+    if (isNaN(hours)) {
+      alert("The amount of hours of you've put is not a number!");
+    } else {
+  
+      let tx = db.transaction(['hoursOff'], "readwrite");
+      let txObj = tx.objectStore('hoursOff');
+  
+      console.log(date + ", " + hours);
+      let request = txObj.put({ date: date, hours: Number(hours) });
+  
+      request.onsuccess = () => resolve();
 
-  if (isNaN(timeOff)) {
-    alert("The amount of days of you've put is not a number!");
-  } else {
-
-    let tx = db.transaction(['daysOff'], "readwrite");
-    let txObj = tx.objectStore('daysOff');
-
-    console.log(date + ", " + timeOff);
-    let request = txObj.put({ startDate: date, timeOff: Number(timeOff) });
-
-    request.onsuccess = function () {
-      console.log("Success!");
-      // window.location.reload();
+      request.onerror = (err) => reject(err);
+  
     }
+  
+  })
+}
 
-  }
+function getHoursOff() {
+  return new Promise(function (resolve, reject) {
 
+    let transaction = db.transaction(['hoursOff'], "readonly");
+    let objectStore = transaction.objectStore('hoursOff');
+
+    let request = objectStore.getAll();
+
+    request.onsuccess = () => resolve(request.result);
+
+    request.onerror = (err) => reject(err);
+
+  });
 }
 
 function getAllHours() {
@@ -190,24 +199,9 @@ function getAllHours() {
 
     let request = objectStore.getAll();
 
-    request.onsuccess = function () {
-      resolve(request.result);
-    }
+    request.onsuccess = () => resolve(request.result);
 
-  });
-}
-
-function getDaysOff() {
-  return new Promise(function (resolve, reject) {
-
-    let transaction = db.transaction(['daysOff'], "readonly");
-    let objectStore = transaction.objectStore('daysOff');
-
-    let request = objectStore.getAll();
-
-    request.onsuccess = function () {
-      resolve(request.result);
-    }
+    request.onerror = (err) => reject(err);
 
   });
 }
@@ -226,33 +220,21 @@ function calculateOvertime() {
       // let lastDate;
       let today = new Date(Date.now());
 
-      getDaysOff().then(daysOffResponse => {
+      getHoursOff().then(hoursOffResponse => {
 
-        console.log(daysOffResponse);
-        let countDaysOff = 0;
-        for (let day in daysOffResponse) {
-          day = daysOffResponse[day];
-          let currentDate = new Date(day.startDate);
-          let difference = Math.round((currentDate.getTime() - firstDate.getTime()) / (24 * 60 * 60 * 1000));
-          console.log(difference);
-          console.log(day, !(difference < 0 && (difference + day.timeOff) < 1));
-
-          if (!((difference + day.timeOff) < 1)) {
-            if (difference < 0) {
-              countDaysOff += difference + day.timeOff; // difference is negative, add only the days that go beyond the first day
-            } else {
-              if (!(Math.round((today.getTime() - currentDate.getTime()) / (24 * 60 * 60 * 1000)) - day.timeOff + 1 < 0)) { // holiday is not in the future
-                if (Math.round((today.getTime() - currentDate.getTime() + (day.timeOff - 1) * 86400000) / (24 * 60 * 60 * 1000)) < 0) { // some holidays in the future
-                  countDaysOff += day.timeOff + Math.round((today.getTime() - currentDate.getTime() + (day.timeOff - 1) * 86400000) / (24 * 60 * 60 * 1000)); // add remainder of holidays
-                } else {
-                  countDaysOff += day.timeOff
-                }
-              }
-            }
+        console.log(hoursOffResponse);
+        
+        let today = new Date();
+        let totalHoursOff = hoursOffResponse.reduce((sum, day) => {
+          // only include hours off from past and present in the calculation (same as actual working hours)
+          if (today - day.date >= 0) {
+            return sum + day.hours;
+          } else {
+            return sum;
           }
-        }
+        }, 0);
 
-        globalAttributes.daysOff = countDaysOff;
+        globalAttributes.hoursOff = totalHoursOff;
 
       }).then(_ => {
 
@@ -266,10 +248,11 @@ function calculateOvertime() {
         // let daysPerMonth = 7*weeksPerMonth;
         // let hoursPerDay = (hoursPerWeek*weeksPerMonth)/daysPerMonth;
         // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
-        console.log(globalAttributes.daysOff);
-        let totalDays = Math.round(Math.abs((firstDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000))) - globalAttributes.daysOff;
+        console.log(globalAttributes.hoursOff);
+        let totalDays = Math.round(Math.abs((firstDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)));
         // let totalRequiredHours = totalDays*(hoursPerWeek/7);
-        let totalRequiredHours = Math.ceil(totalDays / 7) * hoursPerWeek;
+        let totalRequiredHoursNoDaysOff = Math.ceil(totalDays / 7) * hoursPerWeek;
+        let totalRequiredHours = totalRequiredHoursNoDaysOff - globalAttributes.hoursOff;
         let overtime = totalHours - totalRequiredHours;
 
         console.log('Total Days: ' + totalDays);
@@ -313,7 +296,13 @@ function parseGoogleCalendarData(events) {
     console.log(events);
 
     for (const event of events) {
-      await addDay(event.date, event.duration);
+
+      if (['leave', 'free', 'off', 'holiday', 'holidays', 'timeOff'].includes(event.description)) {
+        await addHoursOff(event.date, event.duration);
+      } else {
+        await addDay(event.date, event.duration);
+      }
+
     }
 
     resolve();
@@ -407,32 +396,46 @@ function chooseCalendarProvider() {
   return 'googleCalendar';
 }
 
+function initSync() {
+
+  let cal = chooseCalendarProvider();
+
+  switch (cal) {
+    case 'googleCalendar':
+      loadGoogleCalendarData();
+      break;
+
+    default:
+      break;
+  }
+  
+}
+
 function sync(overwrite = true) {
 
   if (overwrite) {
 
-    let transaction = db.transaction(['days'], "readwrite");
-    let objectStore = transaction.objectStore('days');
+    let transaction1 = db.transaction(['days'], "readwrite");
+    let objectStore1 = transaction1.objectStore('days');
 
-    let request = objectStore.clear();
+    let request1 = objectStore1.clear();
 
-    request.onsuccess = function initSync() {
+    request1.onsuccess = () => {
+      let transaction2 = db.transaction(['hoursOff'], "readwrite");
+      let objectStore2 = transaction2.objectStore('hoursOff');
 
-      let cal = chooseCalendarProvider();
+      let request2 = objectStore2.clear();
 
-      switch (cal) {
-        case 'googleCalendar':
-          loadGoogleCalendarData();
-          break;
+      request2.onsuccess = initSync;
 
-        default:
-          break;
+      request2.onerror = function() {
+        confirm("Old records (hours off) couldn't be erased, sync anyway?") ? initSync() : false;
       }
-      
+
     }
 
-    request.onerror = function() {
-      confirm("Old records couldn't be erased, sync anyway?") ? initSync() : false;
+    request1.onerror = function() {
+      confirm("Old records (working hours) couldn't be erased, sync anyway?") ? initSync() : false;
     }
     
   }
