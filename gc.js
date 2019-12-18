@@ -89,7 +89,8 @@ function handleDetailsClick(event) {
   }).then(function (response) {
     let events = response.result.items;
     events = events.filter(event => event.summary.toUpperCase() == "GSI");
-    window.parent.console.log(events);
+    let eventsOld = [...events];
+    window.parent.console.log(eventsOld);
     // for (let o in events) {
     //   events[o] = { date: (new Date(events[o].start.dateTime)).toJSON(), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)) };
     // }
