@@ -98,8 +98,10 @@ async function handleDetailsClick(event) {
     }
     console.log('options: ', options)
     response = await gapi.client.calendar.events.list(options);
-    window.parent.console.log('response:', response);
+    console.log('response:', response);
+    console.log('events:', events);
     events.concat(response.result.items);
+    console.log('events:', events);
     nextPage = (response.result.nextPageToken != undefined && response.result.nextPageToken != "");
     nextPageToken = (response.result.nextPageToken != undefined && response.result.nextPageToken != "") ? response.result.nextPageToken : "" ;
   }
