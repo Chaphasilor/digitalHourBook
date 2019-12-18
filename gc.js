@@ -85,15 +85,18 @@ async function handleDetailsClick(event) {
   let nextPageToken = "";
   
   while (nextPage) {
-    response = await gapi.client.calendar.events.list({
+    let options = {
       'calendarId': 'primary',
       // 'timeMin': (new Date(2019, 1, 1)).toISOString(),
       'showDeleted': false,
       'singleEvents': true,
       'maxResults': 2500,
       'orderBy': 'startTime',
-      'pageToken': nextPageToken
-    })
+    };
+    if (nextPageToken != "") {
+      options.nextPage = nextPageToken;
+    }
+    response = await gapi.client.calendar.events.list(options)
     events.concat(response.result.items);
     nextPage = (response.result.nextPageToken != undefined && response.result.nextPageToken != "");
     nextPageToken = (response.result.nextPageToken != undefined && response.result.nextPageToken != "") ? response.result.nextPageToken : "" ;
