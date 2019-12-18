@@ -1,5 +1,3 @@
-var globalAttributes = {};
-
 function initUI() {
 
   initDB().then(function (response) {
@@ -42,7 +40,7 @@ var db;
 function initDB() {
   return new Promise(function (resolve, reject) {
 
-    var request = window.indexedDB.open("hourBook", 5);
+    var request = window.indexedDB.open("hourBook", 6.5);
 
     request.onsuccess = function (event) {
 
@@ -73,7 +71,14 @@ function initDB() {
 
       try {
         let holidays = db.createObjectStore("hoursOff", { keyPath: "date" });
-        let timeOff = holidays.createIndex("by_hours", "hours", { unique: false });
+        let hours = holidays.createIndex("by_hours", "hours", { unique: false });
+      } catch (e) {
+        console.log("Object store already exists");
+      }
+
+      try {
+        let weeklyHours = db.createObjectStore("weeklyHours", { keyPath: "date" });
+        let hours = weeklyHours.createIndex("by_hours", "hours", { unique: false });
       } catch (e) {
         console.log("Object store already exists");
       }
@@ -111,7 +116,6 @@ function addDay(date, hours) {
       alert("The amount of hours you put is not a number!");
     } else {
       
-      date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       console.log(date + ", " + hours);
 
       let foundEntry;
@@ -133,6 +137,8 @@ function addDay(date, hours) {
       let request = txObj.put({ date: date, hours: Number(hours) });
 
       request.onsuccess = () => resolve();
+      
+      request.onerror = (err) => reject(err);
 
     }
 
@@ -206,65 +212,153 @@ function getAllHours() {
   });
 }
 
-function calculateOvertime() {
+function changeWeeklyHours(date, newWeeklyHours) {
+  return new Promise((resolve, reject) => {
+  
+    if (isNaN(newWeeklyHours)) {
+      alert("The amount of hours you put is not a number!");
+    } else {
+    
+      console.log(date + ", " + newWeeklyHours);
+
+      let tx = db.transaction(['weeklyHours'], "readwrite");
+      let txObj = tx.objectStore('weeklyHours');
+      let request = txObj.put({ date: date, hours: Number(newWeeklyHours) });
+
+      request.onsuccess = () => resolve();
+      
+      request.onerror = (err) => reject(err);
+
+    }
+  
+  })
+}
+
+function deleteWeeklyHours(date) {
+  return new Promise((resolve, reject) => {
+    
+    let tx = db.transaction(['weeklyHours'], "readwrite");
+    let txObj = tx.objectStore('weeklyHours');
+  
+    let request = txObj.delete(date);
+  
+    request.onsuccess = () => resolve();
+
+    request.onerror = (err) => reject(err);
+  
+  })
+}
+
+function getWeeklyHours() {
   return new Promise(function (resolve, reject) {
 
-    getAllHours().then(function (daysResponse) {
+    let transaction = db.transaction(['weeklyHours'], "readonly");
+    let objectStore = transaction.objectStore('weeklyHours');
+
+    let request = objectStore.getAll();
+
+    request.onsuccess = () => resolve(request.result);
+
+    request.onerror = (err) => reject(err);
+
+  });
+}
 
 
-      console.log(daysResponse);
+/**
+ * A function to calculate the amount of days between two dates. 
+ * Beware that the second date isn't included in the amount.
+ *
+ * @param {Date} date1 the first date
+ * @param {Date} date2 the second date
+ * @returns the amount of days
+ */
+function amountOfDaysBetween(date1, date2) {
+  return Math.round(Math.abs((date1.getTime() - date2.getTime()) / (24 * 60 * 60 * 1000)));
+}
 
-      let totalHours = 0;
+/**
+ * Rounds a given number to .25 accuracy
+ *
+ * @param {Number} number the number to round
+ * @returns a float with either .00, .25, .50 or .75 after the decimal point
+ */
+function roundToQuarter(number) {
+  return parseFloat((Math.round(number * 4) / 4).toFixed(2));
+}
 
-      let firstDate = new Date(daysResponse[0].date);
-      // let lastDate;
-      let today = new Date(Date.now());
+function calculateOvertime() {
+  return new Promise(async function (resolve, reject) {
 
-      getHoursOff().then(hoursOffResponse => {
+    // retrieve data from IndexedDB
+    let daysResponse = await getAllHours();
+    let hoursOffResponse = await getHoursOff();
+    let weeklyHoursResponse = await getWeeklyHours();
+    console.log(daysResponse);
+    console.log(hoursOffResponse);
+    console.log(weeklyHoursResponse);
 
-        console.log(hoursOffResponse);
-        
-        let today = new Date();
-        let totalHoursOff = hoursOffResponse.reduce((sum, day) => {
-          // only include hours off from past and present in the calculation (same as actual working hours)
-          if (today - day.date >= 0) {
-            return sum + day.hours;
-          } else {
-            return sum;
-          }
-        }, 0);
+    // initialize variables
+    let totalHours = 0;
+    const firstDate = new Date(daysResponse[0].date);
+    console.log('firstDate:', firstDate);
+    const today = new Date();
+    
+    // sum up all hours off
+    let totalHoursOff = hoursOffResponse.reduce((sum, day) => {
+      // only include hours off from past and present in the calculation (same as actual working hours)
+      if (today - day.date >= 0) {
+        return sum + day.hours;
+      } else {
+        return sum;
+      }
+    }, 0);
+    console.log('totalHoursOff:', totalHoursOff);
 
-        globalAttributes.hoursOff = totalHoursOff;
+    // sum up all working hours
+    totalHours = daysResponse.reduce((sum, currentDay) => {
+      return sum + currentDay.hours
+    }, 0);
+    console.log('totalHours:', totalHours);
 
-      }).then(_ => {
+    // let hoursPerWeek = 7;
+    // let weeksPerMonth = 4.349; // constant used by GSI
+    // let daysPerMonth = 7*weeksPerMonth;
+    // let hoursPerDay = (hoursPerWeek*weeksPerMonth)/daysPerMonth;
+    // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
 
-        for (let currentDay in daysResponse) {
-          totalHours += daysResponse[currentDay].hours;
-          // lastDate = new Date(daysResponse[currentDay].date);
-        }
+    let totalRequiredHoursNoDaysOff = weeklyHoursResponse.reduce((sum, currentWeeklyHours, o) => {
+      let intervalDays = 0;
+      // if there are no more entries in weeklyHoursResponse, use these weekly hours up until the current day
+      if (o+1 >= weeklyHoursResponse.length) {
+        // because of how amountOfDaysBetween works, we need to count the days until the next day, not the current (the second date is always excluded)
+        let nextDay = new Date(today);
+        nextDay.setDate(nextDay.getDate()+1);
+        intervalDays = amountOfDaysBetween(currentWeeklyHours.date, nextDay);
+        // console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + nextDay.toLocaleDateString() + ':', intervalDays);
+      } else {
+        intervalDays = amountOfDaysBetween(currentWeeklyHours.date, weeklyHoursResponse[o+1].date);
+        // console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + weeklyHoursResponse[o+1].date.toLocaleDateString() + ':', intervalDays);
+      }
+      // console.log('Weekly hours for this interval:', currentWeeklyHours.hours);
+      // console.log('Hours for this interval:', roundToQuarter(intervalDays / 7 * currentWeeklyHours.hours));
+      return sum + roundToQuarter(intervalDays / 7 * currentWeeklyHours.hours);
+    }, 0);
+    console.log('totalRequiredHoursNoDaysOff:', totalRequiredHoursNoDaysOff);
+    
+    let totalDays = amountOfDaysBetween(firstDate, today);
+    // let totalRequiredHours = totalDays*(hoursPerWeek/7);
+    // let totalRequiredHoursNoDaysOff = Math.ceil(totalDays / 7) * hoursPerWeek;
+    
+    let totalRequiredHours = totalRequiredHoursNoDaysOff - totalHoursOff;
+    let overtime = totalHours - totalRequiredHours;
 
-        let hoursPerWeek = 7;
-        // let weeksPerMonth = 4.349; // constant used by GSI
-        // let daysPerMonth = 7*weeksPerMonth;
-        // let hoursPerDay = (hoursPerWeek*weeksPerMonth)/daysPerMonth;
-        // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
-        console.log(globalAttributes.hoursOff);
-        let totalDays = Math.round(Math.abs((firstDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)));
-        // let totalRequiredHours = totalDays*(hoursPerWeek/7);
-        let totalRequiredHoursNoDaysOff = Math.ceil(totalDays / 7) * hoursPerWeek;
-        let totalRequiredHours = totalRequiredHoursNoDaysOff - globalAttributes.hoursOff;
-        let overtime = totalHours - totalRequiredHours;
+    console.log('Total Days: ' + totalDays);
+    console.log('Required Hours: ' + totalRequiredHours);
+    console.log('Actual Hours: ' + totalHours);
+    console.log('Overtime: ' + overtime);
 
-        console.log('Total Days: ' + totalDays);
-        console.log('Required Hours: ' + totalRequiredHours);
-        console.log('Actual Hours: ' + totalHours);
-        console.log('Overtime: ' + overtime);
-
-        resolve(overtime);
-
-      })
-
-    });
+    resolve(overtime);
 
   });
 }
