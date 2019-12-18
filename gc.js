@@ -78,29 +78,39 @@ function handleSignoutClick(event) {
   gapi.auth2.getAuthInstance().signOut();
 }
 
-function handleDetailsClick(event) {
-  gapi.client.calendar.events.list({
-    'calendarId': 'primary',
-    'timeMin': (new Date(2019, 1, 1)).toISOString(),
-    'showDeleted': false,
-    'singleEvents': true,
-    'maxResults': 2500,
-    'orderBy': 'startTime'
-  }).then(function (response) {
-    let events = response.result.items;
-    events = events.filter(event => event.summary.toUpperCase() == "GSI");
-    let eventsOld = [...events];
-    window.parent.console.log(eventsOld);
-    // for (let o in events) {
-    //   events[o] = { date: (new Date(events[o].start.dateTime)).toJSON(), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)) };
-    // }
-    // appendPre(JSON.stringify({ events }));
-    for (let o in events) {
-      events[o] = { date: (new Date(events[o].start.dateTime)), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)), description: events[o].description };
-    }
-    appendPre(JSON.stringify({ events }));
-    window.parent.parseGoogleCalendarDataCallback(events);
-  });
+async function handleDetailsClick(event) {
+  let response = null;
+  let events = [];
+  let nextPage = true;
+  let nextPageToken = "";
+  
+  while (nextPage) {
+    response = await gapi.client.calendar.events.list({
+      'calendarId': 'primary',
+      // 'timeMin': (new Date(2019, 1, 1)).toISOString(),
+      'showDeleted': false,
+      'singleEvents': true,
+      'maxResults': 2500,
+      'orderBy': 'startTime',
+      'pageToken': nextPageToken
+    })
+    events.concat(response.result.items);
+    nextPage = (response.result.nextPageToken != undefined && response.result.nextPageToken != "");
+    nextPageToken = (response.result.nextPageToken != undefined && response.result.nextPageToken != "") ? response.result.nextPageToken : "" ;
+  }
+    
+  events = events.filter(event => event.summary.toUpperCase() == "GSI");
+  let eventsOld = [...events];
+  window.parent.console.log(eventsOld);
+  // for (let o in events) {
+  //   events[o] = { date: (new Date(events[o].start.dateTime)).toJSON(), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)) };
+  // }
+  // appendPre(JSON.stringify({ events }));
+  for (let o in events) {
+    events[o] = { date: (new Date(events[o].start.dateTime)), duration: (Math.abs(((new Date(events[o].end.dateTime)) - (new Date(events[o].start.dateTime))) / 3600000).toFixed(2)), description: events[o].description };
+  }
+  appendPre(JSON.stringify({ events }));
+  window.parent.parseGoogleCalendarDataCallback(events);
 }
 
 /**
