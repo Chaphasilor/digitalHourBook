@@ -94,7 +94,7 @@ async function handleDetailsClick(event) {
       'orderBy': 'startTime',
     };
     if (nextPageToken != "") {
-      options.nextPage = nextPageToken;
+      options.pageToken = nextPageToken;
     }
     console.log('options: ', options)
     response = await gapi.client.calendar.events.list(options);
