@@ -30,7 +30,7 @@ html, body {
   font-size: 1.5rem;
 }
 
-#hoursEntry, #holidaysEntry {
+#hoursEntry, #holidaysEntry, #weeklyHoursEntry {
   display: block;
   transition: height .5s;
   width: 100wv;
@@ -40,7 +40,7 @@ html, body {
   overflow-y: hidden;
 }
 
-#hoursEntry input, #holidaysEntry input {
+#hoursEntry input, #holidaysEntry input, #weeklyHoursEntry input {
   display: block;
   font-size: 1rem;
   margin: auto;
@@ -49,10 +49,10 @@ html, body {
   background-color: white;
 }
 
-#hoursEntry input[type='date'], #holidaysEntry input[type='date'] {
+#hoursEntry input[type='date'], #holidaysEntry input[type='date'], #weeklyHoursEntry input[type='date'] {
   width: auto;
 }
 
-#hoursEntry input[type='text'], #holidaysEntry input[type='text'] {
+#hoursEntry input[type='text'], #holidaysEntry input[type='text'], #weeklyHoursEntry input[type='text'] {
   width: 75%;
 }

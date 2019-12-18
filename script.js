@@ -23,15 +23,21 @@ function updateUI() {
 
 }
 
-function newHoursEntry() {
+function toggleHoursEntry() {
 
-  document.querySelector('#hoursEntry').style.height = 'calc( 3 * var(--hourDiffHeight)';
+  document.querySelector('#hoursEntry').style.height != 'calc( 3 * var(--hourDiffHeight)' ? document.querySelector('#hoursEntry').style.height = 'calc( 3 * var(--hourDiffHeight)' : document.querySelector('#hoursEntry').style.height = '0';
 
 }
 
-function newHolidaysEntry() {
+function toggleHolidaysEntry() {
 
-  document.querySelector('#holidaysEntry').style.height = 'calc( 3 * var(--hourDiffHeight)';
+  document.querySelector('#holidaysEntry').style.height != 'calc( 3 * var(--hourDiffHeight)' ? document.querySelector('#holidaysEntry').style.height = 'calc( 3 * var(--hourDiffHeight)' : document.querySelector('#holidaysEntry').style.height = '0';
+
+}
+
+function toggleWeeklyHoursEntry() {
+
+  document.querySelector('#weeklyHoursEntry').style.height != 'calc( 3 * var(--hourDiffHeight)' ? document.querySelector('#weeklyHoursEntry').style.height = 'calc( 3 * var(--hourDiffHeight)' : document.querySelector('#weeklyHoursEntry').style.height = '0';
 
 }
 

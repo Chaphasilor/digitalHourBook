@@ -22,9 +22,9 @@
 
   <button class='entryForm' type='button' onclick="window.location.href = 'export';">Export</button>
 
-  <button id='addHoliday' class='entryForm' type='button' onclick="newHolidaysEntry();">Add holidays</button>
+  <button id='changeWeeklyHours' class='entryForm' type='button' onclick="toggleWeeklyHoursEntry();">Change Weekly Hours</button>
 
-  <form id='holidaysEntry' action=''
+  <form id='weeklyHoursEntry' action=''
     onsubmit="event.preventDefault();this.style.height='0';addHoursOff(new Date(this.getElementsByTagName('input')[0].value), this.getElementsByTagName('input')[1].value);">
 
     <input type='date' name='date' value="" />
