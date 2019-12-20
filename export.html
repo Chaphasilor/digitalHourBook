@@ -31,7 +31,7 @@
             <option value="11">December</option>
         </select>
 
-        <button type="button" onclick="exportToProzHelper((new Date()).getFullYear(), document.querySelector('#month').value).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export to Proz</button>
+        <button type="button" onclick="exportToProzHelper(document.querySelector('#month').value-11).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export to Proz</button>
         
     </form>
 

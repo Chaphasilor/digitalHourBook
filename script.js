@@ -422,10 +422,14 @@ function parseGoogleCalendarDataCallback(events) {
   
 }
 
-async function exportToProzHelper(year, month) {
+async function exportToProzHelper(monthOffset) {
   return new Promise(async (resolve, reject) => {
   
     let allDays = await getAllHours();
+    let today = new Date();
+    today.setMonth(today.getMonth() + monthOffset);
+    month = today.getMonth();
+    year = today.getFullYear();
 
     let monthDays = allDays.filter(day => {
 
@@ -448,7 +452,7 @@ async function exportToProzHelper(year, month) {
     console.log('test:', test);
 
     while ((new Date(year, month, i)).getMonth() == month) {
-      //TODO add all days to an array, check if actual date exists in monthDays
+      // add all days to an array, check if actual date exists in monthDays
       console.log('i:', i);
       console.log('fullMonthArray:', fullMonthArray);
       if (monthDays.length > 0) {
