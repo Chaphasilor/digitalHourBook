@@ -333,6 +333,11 @@ function calculateOvertime() {
     // let hoursPerDay = (hoursPerWeek*weeksPerMonth)/daysPerMonth;
     // let totalDays = Math.round(Math.abs((firstDate.getTime() - lastDate.getTime())/(24*60*60*1000))+1);
 
+    // only include hours off from past and present in the calculation (same as actual working hours)
+    weeklyHoursResponse = weeklyHoursResponse.filter(currentWeeklyHours => {
+      return today - currentWeeklyHours.date >= 0;
+    })
+    
     let totalRequiredHoursNoDaysOff = weeklyHoursResponse.reduce((sum, currentWeeklyHours, o) => {
       let intervalDays = 0;
       // if there are no more entries in weeklyHoursResponse, use these weekly hours up until the current day
