@@ -466,7 +466,6 @@ function exportToProzHelper(monthOffset) {
     let fullMonthArray = [];
 
     let test = [...monthDays];
-    console.log('test:', test);
 
     while ((new Date(year, month, i)).getMonth() == month) {
       // add all days to an array, check if actual date exists in monthDays
@@ -565,7 +564,11 @@ function sync(overwrite = true) {
 
 function updateClipboard(newClip) {
   navigator.clipboard.writeText(newClip).then(function() {
-    document.body.innerHTML += "<br><span style='color: green;'>Data copied!</span>";
+    let notice = document.querySelector('#notice');
+    notice.innerText = "Data copied to clipboard!";
+    setTimeout(_ => {
+      notice.innerText = '';
+    }, 3000)
     /* clipboard successfully set */
   }, function() {
     alert('Writing to clipboard not allowed, please copy the data manually!')
