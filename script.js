@@ -427,14 +427,26 @@ function parseGoogleCalendarDataCallback(events) {
   
 }
 
-async function exportToProzHelper(monthOffset) {
+function exportPastMonth(monthId) {
+  return new Promise(async(resolve, reject) => {
+  
+    if ((new Date()).getMonth() <= monthId) {
+      monthId -= 12;
+    }
+
+    resolve(await exportToProzHelper(monthId))
+  
+  })
+}
+
+function exportToProzHelper(monthOffset) {
   return new Promise(async (resolve, reject) => {
   
     let allDays = await getAllHours();
-    let today = new Date();
-    today.setMonth(today.getMonth() + monthOffset);
-    month = today.getMonth();
-    year = today.getFullYear();
+    let exportDay = new Date();
+    exportDay.setMonth(monthOffset);
+    month = exportDay.getMonth();
+    year = exportDay.getFullYear();
 
     let monthDays = allDays.filter(day => {
 
