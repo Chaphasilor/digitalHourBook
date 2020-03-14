@@ -42,6 +42,7 @@ function initClient() {
     // detailsButton.onclick = handleDetailsClick;
   }, function (error) {
     appendPre(JSON.stringify(error, null, 2));
+    loading(false)
   });
 }
 
@@ -96,14 +97,23 @@ async function handleDetailsClick(event) {
     if (nextPageToken != "") {
       options.pageToken = nextPageToken;
     }
-    console.log('options: ', options)
-    response = await gapi.client.calendar.events.list(options);
-    console.log('response:', response);
-    console.log('events:', events);
-    events = events.concat(response.result.items);
-    console.log('events:', events);
-    nextPage = (response.result.nextPageToken != undefined && response.result.nextPageToken != "");
-    nextPageToken = (response.result.nextPageToken != undefined && response.result.nextPageToken != "") ? response.result.nextPageToken : "" ;
+    console.log('options: ', options);
+
+    try {
+      response = await gapi.client.calendar.events.list(options);
+      console.log('response:', response);
+      console.log('events:', events);
+      events = events.concat(response.result.items);
+      console.log('events:', events);
+      nextPage = (response.result.nextPageToken != undefined && response.result.nextPageToken != "");
+      nextPageToken = (response.result.nextPageToken != undefined && response.result.nextPageToken != "") ? response.result.nextPageToken : "" ;
+    } catch (err) {
+      nextPage = false;
+      console.error(err);
+      loading(false);
+      return;
+    }
+    
   }
     
   events = events.filter(event => event.summary.toUpperCase() == "GSI");

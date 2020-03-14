@@ -21,6 +21,39 @@
   <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()"
     onreadystatechange="if (this.readyState === 'complete') this.onload()"></script>
 
+  <script>
+    function loading(status) {
+
+      if (status) {
+
+        let overlay = document.createElement('div');
+        let indicator = document.createElement('div');
+        let text = document.createElement('span');
+        text.innerText = 'Loading...';
+        overlay.id = 'loadingIndicatorOverlay';
+        indicator.id = 'loadingIndicator';
+        indicator.appendChild(text);
+        for (let i = 0; i < 3; i++) {
+          let dot = document.createElement('div');
+          let ball = document.createElement('div');
+          dot.classList.add('dot')
+          dot.id = 'dot'+i;
+          dot.appendChild(ball);
+          indicator.append(dot);
+        }
+        
+        overlay.appendChild(indicator);
+        window.parent.document.body.appendChild(overlay);
+
+      } else {
+
+        window.parent.document.querySelector('#loadingIndicatorOverlay').remove();
+        
+      }
+
+    }
+  </script>
+
 </body>
 
 </html>

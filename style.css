@@ -72,3 +72,71 @@ html, body {
   font-size: 1.2rem;
   color: green;
 }
+
+#loadingIndicatorOverlay {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(5px);
+  z-index: 2;
+}
+
+#loadingIndicatorOverlay #loadingIndicator {
+  display: block;
+  position: fixed;
+  left: calc(50vw - (10vw/2));
+  top: calc(50vh - (10vw/2));
+  width: 10vw;
+  height: 10vw;
+  /* background-color: #4d4d4d; */
+  border-radius: 50%;
+}
+
+#loadingIndicatorOverlay #loadingIndicator span {
+  display: block;
+  position: absolute;
+  top: calc(50% - (20%/2));
+  width: 100%;
+  height: 20%;
+  text-align: center;
+  margin: auto;
+}
+
+#loadingIndicatorOverlay #loadingIndicator .dot {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 10px;
+  top: calc(50% - (10px/2));
+}
+
+.dot div {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: aqua;
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  } 
+}
+
+#dot0 {
+  animation: .9s linear 0s infinite loading;
+}
+
+#dot1 {
+  animation: .9s linear .3s infinite loading;
+}
+
+#dot2 {
+  animation: .9s linear .6s infinite loading;
+}
