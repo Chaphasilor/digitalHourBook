@@ -672,9 +672,11 @@ async function importWeeklyHours() {
 
     let weeklyHours = JSON.parse(contents);
 
-    weeklyHours.forEach(async hourObj => {
-      await changeWeeklyHours(new Date(hourObj.date), hourObj.hours);
-    })
+    for (let i = 0; i < weeklyHours.length; i++) {
+      await changeWeeklyHours(new Date(weeklyHours[i].date), weeklyHours[i].hours);
+    }
+    
+    toggleWeeklyHoursBackup();
 
   } catch (err) {
     console.error(err);
