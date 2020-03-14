@@ -15,32 +15,67 @@
 <body>
     
     <form>
-        
-        <select id="month">
-            <option value="0">January</option>
-            <option value="1">Feburary</option>
-            <option value="2">March</option>
-            <option value="3">April</option>
-            <option value="4">May</option>
-            <option value="5">June</option>
-            <option value="6">July</option>
-            <option value="7">August</option>
-            <option value="8">September</option>
-            <option value="9">October</option>
-            <option value="10">November</option>
-            <option value="11">December</option>
-        </select>
+      
+      <button type="button" onclick="exportPastMonth((new Date()).getMonth()-1 < 0 ? 11 : (new Date()).getMonth()-1).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export Last Month</button>
+      
+      <br>
+      
+      <button type="button" onclick="exportPastMonth((new Date()).getMonth()).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export Current Month</button>
 
-        <button type="button" onclick="exportPastMonth(document.querySelector('#month').value).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export to Proz</button>
+      <br>
+        
+      <select id="month"></select>
+    
+      <button type="button" onclick="exportPastMonth(document.querySelector('#month').value).then(data => {document.querySelector('#output').innerHTML=data; updateClipboard(data)});">Export Selected Month</button>
         
     </form>
 
+    <div id="notice"></div>
+
     <textarea id='output' disabled></textarea>
+
+    <footer>
+      <button type="button" onclick="window.location.href = window.location.href.split('/').slice(0, -1).join('/');">Back To Overview</button>
+    </footer>
 
     <script>
 
       window.onload = function() {
+
         initDB();
+
+        const months = [
+          'January',
+          'Febuary',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ];
+
+        let select = document.querySelector('#month');
+        
+        months.forEach((month, id) => {
+
+          let opt = document.createElement('option');
+          opt.value = id;
+
+          let date = new Date();
+          date.setMonth((new Date()).getMonth() < id ? id-12 : id);
+          let year = date.getFullYear(); 
+          
+          opt.innerText = `${month} (${year})`;
+
+          select.appendChild(opt);
+          
+        });
+        
       }
 
     </script>

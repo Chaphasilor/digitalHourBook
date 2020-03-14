@@ -1,3 +1,36 @@
+function loading(status) {
+
+  if (status) {
+
+    let overlay = document.createElement('div');
+    let indicator = document.createElement('div');
+    let text = document.createElement('span');
+    text.innerText = 'Loading...';
+    overlay.id = 'loadingIndicatorOverlay';
+    indicator.id = 'loadingIndicator';
+    indicator.appendChild(text);
+    for (let i = 0; i < 3; i++) {
+      let dot = document.createElement('div');
+      let ball = document.createElement('div');
+      dot.classList.add('dot')
+      dot.id = 'dot'+i;
+      dot.appendChild(ball);
+      indicator.append(dot);
+    }
+    
+    overlay.appendChild(indicator);
+    document.body.appendChild(overlay);
+
+  } else {
+
+    document.querySelector('#loadingIndicatorOverlay').remove();
+    
+  }
+  
+}
+
+
+
 function initUI() {
 
   initDB().then(function (response) {
@@ -12,13 +45,17 @@ function initUI() {
 
 function updateUI() {
 
-  calculateOvertime().then(function (overtime) {
+  calculateOvertime()
+  .then(function (overtime) {
 
     let overtimeSpan = document.querySelector('#overtime').querySelector('span');
     overtimeSpan.innerHTML = overtime;
 
     overtime < 0 ? overtimeSpan.style.color = 'red' : overtimeSpan.style.color = 'green';
 
+  })
+  .catch(err => {
+    console.error(err);
   });
 
 }
@@ -306,6 +343,9 @@ function calculateOvertime() {
 
     // initialize variables
     let totalHours = 0;
+    if (daysResponse.length == 0) {
+      return reject(`No days in IndexedDB!`);
+    }
     const firstDate = new Date(daysResponse[0].date);
     console.log('firstDate:', firstDate);
     const today = new Date();
@@ -386,6 +426,8 @@ function importHours(hoursAsJson) {
 
 function loadGoogleCalendarData() {
 
+  loading(true);
+  
   let frame = document.createElement('iframe');
   frame.src = 'googleIsolator.html';
   frame.style.display = 'none';
@@ -422,6 +464,7 @@ function parseGoogleCalendarDataCallback(events) {
     updateUI();
 
     document.querySelector('#gcLoader').remove();
+    loading(false);
     
   })
   
@@ -430,7 +473,7 @@ function parseGoogleCalendarDataCallback(events) {
 function exportPastMonth(monthId) {
   return new Promise(async(resolve, reject) => {
   
-    if ((new Date()).getMonth() <= monthId) {
+    if ((new Date()).getMonth() < monthId) {
       monthId -= 12;
     }
 
@@ -466,7 +509,6 @@ function exportToProzHelper(monthOffset) {
     let fullMonthArray = [];
 
     let test = [...monthDays];
-    console.log('test:', test);
 
     while ((new Date(year, month, i)).getMonth() == month) {
       // add all days to an array, check if actual date exists in monthDays
@@ -565,7 +607,11 @@ function sync(overwrite = true) {
 
 function updateClipboard(newClip) {
   navigator.clipboard.writeText(newClip).then(function() {
-    document.body.innerHTML += "<br><span style='color: green;'>Data copied!</span>";
+    let notice = document.querySelector('#notice');
+    notice.innerText = "Data copied to clipboard!";
+    setTimeout(_ => {
+      notice.innerText = '';
+    }, 3000)
     /* clipboard successfully set */
   }, function() {
     alert('Writing to clipboard not allowed, please copy the data manually!')
