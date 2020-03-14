@@ -473,7 +473,7 @@ function parseGoogleCalendarDataCallback(events) {
 function exportPastMonth(monthId) {
   return new Promise(async(resolve, reject) => {
   
-    if ((new Date()).getMonth() <= monthId) {
+    if ((new Date()).getMonth() < monthId) {
       monthId -= 12;
     }
 
