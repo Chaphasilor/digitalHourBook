@@ -35,6 +35,17 @@
 
   </form>
 
+  <button id='changeWeeklyHoursBackup' class='entryForm' type='button' onclick="toggleWeeklyHoursBackup();">Backup Weekly Hours</button>
+
+  <form id='weeklyHoursBackup' action=''
+    onsubmit="event.preventDefault();this.style.height='0';">
+    
+      <input class='entryForm' type='button' onclick="exportWeeklyHours();" value="Export Weekly Hours" />
+    
+      <input class='entryForm' type='button' onclick="importWeeklyHours();" value="Import Weekly Hours" />
+
+  </form>
+
   <script type='text/javascript' src='script.js'></script>
 
   <script>

@@ -78,6 +78,12 @@ function toggleWeeklyHoursEntry() {
 
 }
 
+function toggleWeeklyHoursBackup() {
+
+  document.querySelector('#weeklyHoursBackup').style.height != 'calc( 3 * var(--hourDiffHeight)' ? document.querySelector('#weeklyHoursBackup').style.height = 'calc( 3 * var(--hourDiffHeight)' : document.querySelector('#weeklyHoursBackup').style.height = '0';
+
+}
+
 var db;
 
 function initDB() {
