@@ -80,7 +80,7 @@ function toggleWeeklyHoursEntry() {
 
 function toggleWeeklyHoursBackup() {
 
-  document.querySelector('#weeklyHoursBackup').style.height != 'calc( 3 * var(--hourDiffHeight)' ? document.querySelector('#weeklyHoursBackup').style.height = 'calc( 3 * var(--hourDiffHeight)' : document.querySelector('#weeklyHoursBackup').style.height = '0';
+  document.querySelector('#weeklyHoursBackup').style.height != 'calc( 2 * var(--hourDiffHeight)' ? document.querySelector('#weeklyHoursBackup').style.height = 'calc( 2 * var(--hourDiffHeight)' : document.querySelector('#weeklyHoursBackup').style.height = '0';
 
 }
 
@@ -290,6 +290,21 @@ function deleteWeeklyHours(date) {
     let txObj = tx.objectStore('weeklyHours');
   
     let request = txObj.delete(date);
+  
+    request.onsuccess = () => resolve();
+
+    request.onerror = (err) => reject(err);
+  
+  })
+}
+
+function clearWeeklyHours() {
+  return new Promise((resolve, reject) => {
+  
+    let tx = db.transaction(['weeklyHours'], "readwrite");
+    let txObj = tx.objectStore('weeklyHours');
+  
+    let request = txObj.clear();
   
     request.onsuccess = () => resolve();
 
@@ -623,4 +638,90 @@ function updateClipboard(newClip) {
     alert('Writing to clipboard not allowed, please copy the data manually!')
     /* clipboard write failed */
   });
+}
+
+async function exportWeeklyHours() {
+
+  let allWeeklyHours;
+
+  try {
+    allWeeklyHours = await getWeeklyHours();
+  } catch (err) {
+    console.error(err);
+  }
+
+  let exportString = JSON.stringify(allWeeklyHours);
+
+  console.log('allWeeklyHours:', allWeeklyHours);
+  console.log('exportString:', exportString);
+
+  downloadDataAsFile(exportString, `DHB_Weekly-Hours-Backup_${(new Date()).toISOString().substr(0, 10)}.json`);
+
+  toggleWeeklyHoursBackup();
+  
+}
+
+async function importWeeklyHours() {
+
+  let contents;
+  
+  try {
+
+    contents = await loadFile();
+    await clearWeeklyHours();
+
+    let weeklyHours = JSON.parse(contents);
+
+    weeklyHours.forEach(async hourObj => {
+      await changeWeeklyHours(new Date(hourObj.date), hourObj.hours);
+    })
+
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log('contents:', contents);
+  
+}
+
+// customized from https://gist.github.com/liabru/11263260
+function downloadDataAsFile(data, filename) {
+
+  let blob = new Blob([data], {type: 'text/plain'});
+  let anchor = document.createElement('a');
+
+  anchor.download = filename;
+  anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+  anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
+  anchor.click();
+
+  URL.revokeObjectURL(anchor.href);
+  
+}
+
+function loadFile() {
+  return new Promise((resolve, reject) => {
+
+    let fileInput = document.createElement('input');
+    fileInput.type = `file`;
+    fileInput.addEventListener('change', e => {
+
+      let file = e.target.files[0];
+      if (!file) {
+        return;
+      }
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let contents = e.target.result;
+        resolve(contents)
+      };
+      reader.onerror = reject;
+      reader.onabort = reject;
+      reader.readAsText(file);
+      
+    }, false);
+
+    fileInput.click();
+  
+  })
 }
