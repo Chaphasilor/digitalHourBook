@@ -677,6 +677,7 @@ async function importWeeklyHours() {
     }
     
     toggleWeeklyHoursBackup();
+    updateUI();
 
   } catch (err) {
     console.error(err);
