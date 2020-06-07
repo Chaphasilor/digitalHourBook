@@ -89,6 +89,7 @@ async function handleDetailsClick(event) {
     let options = {
       'calendarId': 'primary',
       // 'timeMin': (new Date(2019, 1, 1)).toISOString(),
+      'q': 'gsi', // only list events that contain the string 'gsi' in any casing in any field
       'showDeleted': false,
       'singleEvents': true,
       'maxResults': 2500,
