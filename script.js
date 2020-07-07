@@ -139,6 +139,8 @@ function initDB() {
 
 function getDay(date) {
   return new Promise((resolve, reject) => {
+
+    date = new Date(date.toDateString());
   
     let tx = db.transaction(['days'], "readonly");
     let txObj = tx.objectStore('days');
@@ -161,6 +163,8 @@ function getDay(date) {
 function addDay(date, hours) {
   return new Promise(async (resolve, reject) => {
 
+    date = new Date(date.toDateString());
+    
     if (isNaN(hours)) {
       alert("The amount of hours you put is not a number!");
     } else {
@@ -196,6 +200,8 @@ function addDay(date, hours) {
 
 function deleteDay(date) {
   return new Promise((resolve, reject) => {
+
+    date = new Date(date.toDateString());
     
     let tx = db.transaction(['days'], "readwrite");
     let txObj = tx.objectStore('days');
@@ -211,6 +217,8 @@ function deleteDay(date) {
 
 function addHoursOff(date, hours) {
   return new Promise((resolve, reject) => {
+
+    date = new Date(date.toDateString());
   
     if (isNaN(hours)) {
       alert("The amount of hours of you've put is not a number!");
@@ -263,6 +271,8 @@ function getAllHours() {
 
 function changeWeeklyHours(date, newWeeklyHours) {
   return new Promise((resolve, reject) => {
+
+    date = new Date(date.toDateString());
   
     if (isNaN(newWeeklyHours)) {
       alert("The amount of hours you put is not a number!");
@@ -285,6 +295,8 @@ function changeWeeklyHours(date, newWeeklyHours) {
 
 function deleteWeeklyHours(date) {
   return new Promise((resolve, reject) => {
+
+    date = new Date(date.toDateString());
     
     let tx = db.transaction(['weeklyHours'], "readwrite");
     let txObj = tx.objectStore('weeklyHours');
@@ -435,12 +447,16 @@ function calculateOvertime() {
   });
 }
 
-function importHours(hoursAsJson) {
+async function importHours(hoursAsJson) {
 
   let hoursAsObject = JSON.parse(hoursAsJson);
 
   for (const date of hoursAsObject) {
-    addDay(date.date, date.hours[0].hours);
+    try {
+      await addDay(date.date, date.hours[0].hours);
+    } catch (err) {
+      console.error(`Error while importing hours for day: ${err}`);
+    }
   }
 
 }
@@ -468,7 +484,11 @@ function parseGoogleCalendarData(events) {
       if (['leave', 'free', 'off', 'holiday', 'holidays', 'timeOff'].includes(event.description)) {
         await addHoursOff(event.date, event.duration);
       } else {
-        await addDay(event.date, event.duration);
+        try {
+          await addDay(event.date, event.duration);
+        } catch (err) {
+          console.error(`Error while importing hours for day: ${err}`);
+        }
       }
 
     }
