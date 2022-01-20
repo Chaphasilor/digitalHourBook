@@ -284,7 +284,10 @@ function changeWeeklyHours(date, newWeeklyHours) {
       let txObj = tx.objectStore('weeklyHours');
       let request = txObj.put({ date: date, hours: Number(newWeeklyHours) });
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        updateUI();
+        resolve();
+      }
       
       request.onerror = (err) => reject(err);
 
@@ -342,8 +345,8 @@ function getWeeklyHours() {
 
 
 /**
- * A function to calculate the amount of days between two dates. 
- * Beware that the second date isn't included in the amount.
+ * A function to calculate the amount of days between two dates.  
+ * Both dates are inclusive
  *
  * @param {Date} date1 the first date
  * @param {Date} date2 the second date
@@ -360,7 +363,7 @@ function amountOfDaysBetween(date1, date2) {
  * @returns a float with either .00, .25, .50 or .75 after the decimal point
  */
 function roundToQuarter(number) {
-  return parseFloat((Math.round(number * 4) / 4).toFixed(2));
+  return parseFloat((Math.ceil(number * 4) / 4).toFixed(2));
 }
 
 function calculateOvertime() {
@@ -415,17 +418,16 @@ function calculateOvertime() {
       let intervalDays = 0;
       // if there are no more entries in weeklyHoursResponse, use these weekly hours up until the current day
       if (o+1 >= weeklyHoursResponse.length) {
-        // because of how amountOfDaysBetween works, we need to count the days until the next day, not the current (the second date is always excluded)
-        let nextDay = new Date(today);
-        nextDay.setDate(nextDay.getDate()+1);
-        intervalDays = amountOfDaysBetween(currentWeeklyHours.date, nextDay);
-        // console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + nextDay.toLocaleDateString() + ':', intervalDays);
+        intervalDays = amountOfDaysBetween(currentWeeklyHours.date, today);
+        console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + today.toLocaleDateString() + ':', intervalDays);
       } else {
         intervalDays = amountOfDaysBetween(currentWeeklyHours.date, weeklyHoursResponse[o+1].date);
-        // console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + weeklyHoursResponse[o+1].date.toLocaleDateString() + ':', intervalDays);
+        console.log('Interval between ' + currentWeeklyHours.date.toLocaleDateString() + ' and ' + weeklyHoursResponse[o+1].date.toLocaleDateString() + ':', intervalDays);
       }
-      // console.log('Weekly hours for this interval:', currentWeeklyHours.hours);
-      // console.log('Hours for this interval:', roundToQuarter(intervalDays / 7 * currentWeeklyHours.hours));
+
+      console.log(`intervalDays:`, intervalDays)
+      console.log('Weekly hours for this interval:', currentWeeklyHours.hours);
+      console.log('Hours for this interval:', roundToQuarter(intervalDays / 7 * currentWeeklyHours.hours));
       return sum + roundToQuarter(intervalDays / 7 * currentWeeklyHours.hours);
     }, 0);
     console.log('totalRequiredHoursNoDaysOff:', totalRequiredHoursNoDaysOff);
