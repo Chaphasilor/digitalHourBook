@@ -483,7 +483,7 @@ function parseGoogleCalendarData(events) {
 
     for (const event of events) {
 
-      if (['leave', 'free', 'off', 'holiday', 'holidays', 'timeOff'].includes(event.description)) {
+      if (['leave', 'free', 'off', 'holiday', 'holidays', 'timeOff', 'sick leave', 'sick', 'ill'].includes(event.description)) {
         await addHoursOff(event.date, event.duration);
       } else {
         try {
